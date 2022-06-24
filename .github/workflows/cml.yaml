@@ -20,7 +20,7 @@ jobs:
             PREVIOUS_REF=main
           fi
 
-          echo "# CML Report" > report.md
+          echo "# Metrics Report" > report.md
           echo "## Plots" >> report.md
           dvc plots diff $PREVIOUS_REF workspace \
             --show-vega --targets evaluation/plots/precision_recall.json > vega.json
