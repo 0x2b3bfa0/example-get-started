@@ -9,40 +9,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - name: Generate metrics report
+      - uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          cml ci
-          if [ $GITHUB_REF = refs/heads/main ]; then
-            PREVIOUS_REF=HEAD~1
-          else
-            PREVIOUS_REF=main
-            git fetch origin main
-          fi
-
-          dvc plots diff $PREVIOUS_REF workspace \
-            --show-vega --targets evaluation/plots/precision_recall.json > vega.json
-            cat vega.json
-          vl2svg vega.json prc.svg
-
-          dvc plots diff $PREVIOUS_REF workspace \
-            --show-vega --targets evaluation/plots/confusion_matrix.json > vega.json
-            cat vega.json
-            
-          vl2svg vega.json confusion.svg
-
-          dvc_report=$(dvc exp diff $PREVIOUS_REF --show-md)
-
-          cat <<EOF > report.md
-          # CML Report
-          ## Plots
-          ![Precision & Recall](./prc.svg)
-          ![Confusion Matrix](./confusion.svg)
-
-          ## Metrics and Params
-          ### ${PREVIOUS_REF} → workspace
-          ${dvc_report}
-          EOF
-
-          cml comment create --pr=false report.md
+     
